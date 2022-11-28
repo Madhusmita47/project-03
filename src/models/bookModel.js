@@ -38,12 +38,12 @@ const bookSchema = new mongoose.Schema({
         trim: true
     },
     reviews: {
-        type: number,
+        type: Number,
         default: 0
     },
     deletedAt: { type: Date },
     isDeleted: {
-        type: boolean,
+        type: Boolean,
         default: false
     },
     releasedAt: {

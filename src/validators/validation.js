@@ -32,14 +32,20 @@ const isValidName = function (name) {
 
 //==============================// isValidMobile //===============================
 
-const isValidMobile = function (mobile) {
- if (/^[0]?[6789]\d{9}$/.test(mobile)){
+const isValidPhone = function (phone) {
+ if (/^[0]?[6789]\d{9}$/.test(phone)){
     return true
  }
 }
+//==============================// isValidPassword //==============================
 
+const isValidPassword = function(password){
+  if (/^(?=.*[0-9])(?=.*[!.@#$%^&*])[a-zA-Z0-9!.@#$%^&*]{8,15}$/.test(password)){
+    return true
+  }
+}
 
 
 //=============================// module exports //==============================
 
-module.exports = { isValidEmail, isIdValid, isValidString,isValidName,isValidMobile}
+module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword }
