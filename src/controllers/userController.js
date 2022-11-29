@@ -88,16 +88,16 @@ let loginUser=async function(req,res){
         return res.status(400).send({status:false,message:"email is mandatory"})
     }
   
-     if(isValidEmail(email)==false) {
-        return res.status(400).send({status:false,message:"invalid email"})
+    if(!isValidEmail(email)) {
+        return res.status(400).send({ status: false, msg: "email is invalid" })
     }
   
      if(!(password)) { 
         return res.status(400).send({status:false,message:"password is mandatory"})
     }
   
-     if(isValidPassword(password)==false) { 
-        return res.status(400).send({status:false,message:"invalid password"})
+    if(!isValidPassword(password)) {
+        return res.status(400).send({ status: false, msg: "password is invalid" })
     }
   
       let userPresent=await userModel.findOne({email:email,password:password})
