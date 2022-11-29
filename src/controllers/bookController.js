@@ -5,6 +5,8 @@ const validator = require('../validators/validation')
 const moment = require('moment')
 const lodash = require('lodash')
 const jwt = require('jsonwebtoken')
+
+//============================ post API for create book ===================================
 const createBook = async function(req,res){
     try{
         let data = req.body
@@ -78,7 +80,7 @@ const createBook = async function(req,res){
 }
 
 
-// get book
+//============================ get  API for book by query===================================
 
 const getBookByQuery = async function(req,res){
     try{
@@ -116,16 +118,20 @@ const getBookByQuery = async function(req,res){
     }
 }
 
-//get by param
+//============================ get API for book by params ===================================
 const getBookbyId= async function(req,res){
     try{
         let bookId=req.params.bookId
         //checkobjectId is valid or not
-        if(validator.isIdValid(bookId)==false) { return res.status(400).send({status:false,message:"Book Id is not valid"})}
+        if(validator.isIdValid(bookId)==false) {
+             return res.status(400).send({status:false,message:"Book Id is not valid"})
+            }
 
         let books=await bookModel.findOne({_id:bookId,isDeleted:false})
         
-        if(!books) { return res.status(400).send({status:false,message:"data doesnot exist or already deleted"})}
+        if(!books) { 
+            return res.status(400).send({status:false,message:"data doesnot exist or already deleted"})
+        }
         let reviewDetails=await reviewModel.find({bookId:books._id})
       
         Object.assign(books,{reviewDetails:reviewDetails})
@@ -137,77 +143,43 @@ const getBookbyId= async function(req,res){
     }
 }
 
-//update
-const updateBookById = async function (req, res){
-    try {
-      const reqBody = req.body
-      const bookId = req.params.bookId
-      const { title, excerpt, ISBN, releasedAt } = reqBody
-  
-      //------------------------------body validation-----------------------------------
-      if (!dataValidation(reqBody))
-        return res.status(400).send({ status: false, message: 'Please fill the data' })
-  
-      if (Object.keys(reqBody).length > 4)
-        return res.status(400).send({ status: false, message: 'You can not add extra field' })
-  
-      //------------------------------bookId validation-----------------------------------
-      if (!isValidObjectId(bookId))
-        return res.status(400).send({ status: false, message: `No book found by this bookId '${bookId}'` })
-  
-      //------------------------------title validation-----------------------------------
-      if (!isValidTitle(title))
-        return res.status(400).send({ status: false, message: 'title is not valid' })
-  
-      //------------------------------excerpt validation-----------------------------------
-      if (excerpt)
-        if (!isValidText(excerpt))
-          return res.status(400).send({ status: false, message: 'excerpt is not valid' })
-  
-      //------------------------------ISBN validation-----------------------------------
-      if (ISBN)
-        if (!isValidIsbn(ISBN))
-          return res.status(400).send({ status: false, message: 'ISBN is not valid' })
-  
-      //------------------------------isValidDate validation-----------------------------------
+//============================ Put api for updation ===================================
+const updateBookById = async function(req,res){
+    try{
+        let bookId = req.params.bookId
+        
+        
+        let bookDetails =  await bookModel.findOne({_id:bookId,isDeleted:false})
+        if(!bookDetails)
+        return res.status(404).send({status:false,message:"Book not found!"})
 
-  
-      //-------------------finding Book by id through params----------------------
-      const book = await bookModel.findById(bookId);
-  
-      if (!book)
-        return res.status(404).send({ status: false, message: 'Book not found' });
-  
-      //---------------------------checking authorization-----------------------------
-      if (req.user != book.userId)
-        return res.status(403).send({ status: false, message: `This '${bookId}' person is Unauthorized.` });
-  
-      if (!book)
-        return res.status(404).send({ status: false, message: "Book not found" });
-  
-      if (book.isDeleted === true)
-        return res.status(400).send({ status: false, message: `This '${bookId}' book is already deleted.` })
-  
-      //---------------------------finding duplicate title---------------------------
-      if (book.title === title)
-        return res.status(400).send({ status: false, message: 'title is Duplicate' })
-  
-      //------------------------------finding duplicate ISBN------------------------------
-      if (book.ISBN === ISBN)
-        return res.status(400).send({ status: false, message: 'ISBN is Duplicate' })
-  
-      //------------------------------book updation------------------------------
-      const updatedBook = await bookModel.findByIdAndUpdate({ _id: bookId }, { $set: reqBody }, { new: true });
-  
-      res.status(200).send({ status: true, message: "Updated Successfully", data: updatedBook })
-  
-    }
-    catch (err) {
-      res.status(500).send({ status: false, error: err.message })
-    }
-  }
+        let data = req.body
 
-//Delete api
+       
+        //updating
+
+        let update = await bookModel.findByIdAndUpdate({
+            _id:bookId},
+            {
+                $set:{
+                    title:data.title,
+                    ISBN:data.ISBN,
+                    excerpt:data.excerpt,
+                    releasedAt:moment(new Date()).format("YYYY-MM-DD")
+                }
+            },
+            {new:true}
+            );
+            console.log(update)
+            return res.status(200).send({status:true,data:update})
+    }
+    catch(err){
+        return res.status(500).send({status:false,msg:err.message})
+    }
+}
+
+
+//============================ delete api by params ===================================
 
 const deleteBook =async function(req,res){
     try{
@@ -226,23 +198,12 @@ const deleteBook =async function(req,res){
             return res.status(400).send({status:false,message:"Book is already deleted!"})
         }
 
-    //authorisation
-    let token = req.headers["x-auth-token"]
-    let decoded = jwt.verify(token, 'group 38')
 
-    if (!decoded) {
-        return res.status(400).send({ status: false, msg: "token is not valid" })
-    }
     
-    let userLoggedIn = decoded.userId
-    
-
-    if (bookDetails.userId!= userLoggedIn)
-        return res.status(401).send({ status: false, msg: 'user logged is not allowed to modify the requested books data' })
 
     //delete
     let deleteDocument = await bookModel.findOneAndUpdate(
-        {_id:data},
+        {_id:bookId},
         {
             $set:{
                 isDeleted:true,
@@ -256,4 +217,4 @@ const deleteBook =async function(req,res){
         return res.status(500).send({status:false,msg:err.message})
     }
 }
-module.exports = { createBook,getBookByQuery,deleteBook }
+module.exports = { createBook,getBookByQuery,deleteBook,updateBookById }

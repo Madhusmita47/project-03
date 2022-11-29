@@ -10,7 +10,8 @@ router.post('/register', userController.createUser)
 router.post('/books', mid.Authentication,bookController.createBook)
 router.post('/login', userController.loginUser)
 router.get('/books',mid.Authentication,bookController.getBookByQuery)
-router.delete('/books/:bookId',mid.Authentication,bookController.deleteBook)
+router.delete('/books/:bookId',mid.Authentication,mid.authorisation,bookController.deleteBook)
+router.put('/books/:bookId',mid.Authentication,mid.authorisation,bookController.updateBookById)
 
 
 module.exports=router

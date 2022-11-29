@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken")
-
+const bookModel = require('../models/bookModel')
 //=========================== Authentication ==========================================
 
 const Authentication=function (req,res,next){
@@ -14,5 +14,27 @@ const Authentication=function (req,res,next){
         res.status(500).send({status: false, msg: error.message })
     }
  }
-
- module.exports = {Authentication}
+const authorisation = async function(req,res,next){
+    try{
+        let bookId = req.params.bookId
+        let token = req.headers["x-auth-token"]
+        let decoded = jwt.verify(token, 'group 38')
+    
+        if (!decoded) {
+            return res.status(400).send({ status: false, msg: "token is not valid" })
+        }
+        
+        let userLoggedIn = decoded.userId
+        
+        let bookDetails =  await bookModel.findOne({_id:bookId,isDeleted:false})
+        if (bookDetails.userId!= userLoggedIn)
+            return res.status(401).send({ status: false, msg: 'user logged is not allowed to modify the requested books data' })
+            else {
+                next()
+            }
+    }
+    catch (error) {
+        res.status(500).send({status: false, msg: error.message })
+    }
+}
+ module.exports = {Authentication,authorisation}

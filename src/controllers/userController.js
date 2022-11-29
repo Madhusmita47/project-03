@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken")
-const { isValidString, isValidName, isValidPhone, isValidEmail, isValidPassword  } = require("../validators/validation");
+const { isValidString, isValidName, isValidPhone, isValidEmail, isValidPassword,isValidtitle  } = require("../validators/validation");
 
 //============================ post API for create user ===================================
 
@@ -14,6 +14,9 @@ const createUser = async function (req, res) {
         }
         if (!isValidString(title)) {
             return res.status(400).send({ status: false, msg: "title can not found" })
+        }
+        if(!isValidtitle(title)){
+            return res.status(400).send({status:false,message:"Title is not valid"})
         }
        if (!isValidString(name)) {
            return res.status(400).send({ status: false, msg: "Name not found" })

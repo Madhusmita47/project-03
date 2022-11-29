@@ -47,11 +47,17 @@ const isValidPassword = function(password){
 
 //==============================// isValidISBN //==============================
 const isValidIsbn = function(ISBN){
-  if ((/^ISBN[-](1[03])[ ](: ){0,1})(([0-9Xx][- ]){13}|([0-9Xx][- ]){10})$/.test(ISBN))){
+  if ((/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN))){
+    return true
+  }
+}
+//==============================// isValidtitle //==============================
+const isValidtitle = function(title){
+  if (title =="Mr" || title=="Mrs" || title =="Miss"){
     return true
   }
 }
 
 //=============================// module exports //==============================
 
-module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword,isValidIsbn }
+module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword,isValidIsbn,isValidtitle }
