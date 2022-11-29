@@ -45,7 +45,13 @@ const isValidPassword = function(password){
   }
 }
 
+//==============================// isValidISBN //==============================
+const isValidIsbn = function(ISBN){
+  if ((/^ISBN[-](1[03])[ ](: ){0,1})(([0-9Xx][- ]){13}|([0-9Xx][- ]){10})$/.test(ISBN))){
+    return true
+  }
+}
 
 //=============================// module exports //==============================
 
-module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword }
+module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword,isValidIsbn }

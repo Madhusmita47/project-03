@@ -9,7 +9,7 @@ const createUser = async function (req, res) {
         let data = req.body;
         let {title , name, phone, email, password, address} = data;
         
-        if (Object.keys(data).length == 0) {
+        if (Object.keys(data).length === 0) {
             return res.status(400).send({ status: false, msg: "Body can not empty" })
         }
         if (!isValidString(title)) {
@@ -39,7 +39,7 @@ const createUser = async function (req, res) {
         }
         let emailExist = await userModel.findOne({email:email})
         if(emailExist){
-            return res.status(400).send({status:false, msg: "email number already exist"})
+            return res.status(400).send({status:false, msg: "email-Id already exist"})
         }
         if (!isValidString(password)) {
             return res.status(400).send({ status: false, msg: "password not found" })
@@ -75,27 +75,38 @@ const createUser = async function (req, res) {
 let loginUser=async function(req,res){
     try{
       let data=req.body
-      if(Object.keys(data).length==0) {return res.status(400).send({status:false,message:"data is not present"})}
+      if(Object.keys(data).length===0) {
+        return res.status(400).send({status:false,message:"data is not present"})
+    }
       email=req.body.email
       password=req.body.password
       
-     if(!(email)) {return res.status(400).send({status:false,message:"email is mandatory"})}
+     if(!(email)) {
+        return res.status(400).send({status:false,message:"email is mandatory"})
+    }
   
-     if(isValidEmail(email)==false) {return res.status(400).send({status:false,message:"invalid email"})}
+     if(isValidEmail(email)==false) {
+        return res.status(400).send({status:false,message:"invalid email"})
+    }
   
-     if(!(password)) { return res.status(400).send({status:false,message:"password is mandatory"})}
+     if(!(password)) { 
+        return res.status(400).send({status:false,message:"password is mandatory"})
+    }
   
-     if(isValidPassword(password)==false) { return res.status(400).send({status:false,message:"invalid password"})}
+     if(isValidPassword(password)==false) { 
+        return res.status(400).send({status:false,message:"invalid password"})
+    }
   
       let userPresent=await userModel.findOne({email:email,password:password})
   
-      if(!(userPresent)) { return res.status(400).send({status:false,message:"email or password is incorrect"})}
+      if(!(userPresent)) {
+         return res.status(400).send({status:false,message:"email or password is incorrect"})
+        }
   
       let token=jwt.sign({
-          userId:userPresent._id,
-          username:userPresent.name,
+          userId:userPresent._id.toString(),
       
-      },"group 38",{expiresIn:"1min"},{iat:Date.now()})
+      },"group 38",{expiresIn:"1hr"},{iat:Date.now()})
   
       res.setHeader("x-auth-token",token)
       res.status(200).send({status:true,token:token})
