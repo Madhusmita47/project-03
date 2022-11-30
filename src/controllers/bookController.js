@@ -5,6 +5,7 @@ const validator = require('../validators/validation')
 const moment = require('moment')
 const lodash = require('lodash')
 const jwt = require('jsonwebtoken')
+const reviewModel=require("../models/reviewModel")
 
 //============================ post API for create book ===================================
 const createBook = async function(req,res){
@@ -134,7 +135,8 @@ const getBookbyId= async function(req,res){
         }
         let reviewDetails=await reviewModel.find({bookId:books._id})
       
-        Object.assign(books,{reviewDetails:reviewDetails})
+       books=JSON.parse(JSON.stringify(books))
+       books.reviewDetails=reviewDetails
     
         res.status(200).send({status:true,message:"Booklist", data:books})
     }
@@ -217,4 +219,4 @@ const deleteBook =async function(req,res){
         return res.status(500).send({status:false,msg:err.message})
     }
 }
-module.exports = { createBook,getBookByQuery,deleteBook,updateBookById }
+module.exports = { createBook,getBookByQuery,getBookbyId,deleteBook,updateBookById }
