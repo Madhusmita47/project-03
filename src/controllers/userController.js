@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken")
-const { isValidString, isValidName, isValidPhone, isValidEmail, isValidPassword,isValidtitle  } = require("../validators/validation");
+const { isValidString, isValidName, isValidPhone, isValidEmail, isValidPassword,isValidtitle, isvalidPincode  } = require("../validators/validation");
 
 //============================ post API for create user ===================================
 
@@ -54,13 +54,18 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "address not found" })
         }
         let {street, city, pincode} = address
+       
         if(!isValidString(street)){
-            return res.status(400).send({status:false, msg: "invalid street"})
+            return res.status(400).send({status:false, msg: "street not found"})
         }
+       
         if(!isValidString(city)){
-            return res.status(400).send({status:false, msg: "invalid city"})
+            return res.status(400).send({status:false, msg: "city not found"})
         }
         if(!isValidString(pincode)){
+            return res.status(400).send({status:false, msg: "pincode not found"})
+        }
+        if(!isvalidPincode(pincode)){
             return res.status(400).send({status:false, msg: "invalid pincode"})
         }
         

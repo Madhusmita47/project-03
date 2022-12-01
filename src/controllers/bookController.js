@@ -15,7 +15,7 @@ const createBook = async function(req,res){
             return res.status(400).send({status:false,msg:"Request Body is Empty!"})
         }
         
-        let {title,excerpt,userId,ISBN,category,subcategory} = data
+        let {title,excerpt,userId,ISBN,category,subcategory, releasedAt} = data
         
     
 
@@ -65,11 +65,14 @@ const createBook = async function(req,res){
         if(!validator.isValidString(subcategory)){
             return res.status(400).send({status:false,msg:"Please Enter subcategory"})
         }
-        // checking releaseAt
-        // if(!validator.isValidString(releaseAt)){
-        //     return res.status(400).send({status:false,msg:"Please Enter release At"})
-        // }
-        data["releaseAt"] = moment(new Date()).format("YYYY-MM-DD")
+        //checking releaseAt
+        if(!validator.isValidString(releasedAt)){
+            return res.status(400).send({status:false,msg:"Please Enter release At"})
+        }
+        if(!validator.isValidDate(releasedAt)){
+            return res.status(400).send({status:false,msg:"Please Enter valid date format"})
+        }
+        
 
         //create Book
         let saveData = await bookModel.create(data)
@@ -112,7 +115,7 @@ const getBookByQuery = async function(req,res){
         }
         //sorting the title in alphabetical order with the help of lodash
         let sorted = lodash.sortBy(bookDetails,["title"])
-        return res.status(200).send({status:true,data:sorted})
+        return res.status(200).send({status:true, message: "book list", data:sorted})
     }
     catch(err){
         return res.status(500).send({status:false,msg:err.message})
@@ -138,7 +141,7 @@ const getBookbyId= async function(req,res){
        books=JSON.parse(JSON.stringify(books))
        books.reviewDetails=reviewDetails
     
-        res.status(200).send({status:true,message:"Booklist", data:books})
+        res.status(200).send({status:true, message:"Book list", data:books})
     }
     catch(err){
         res.status(500).send({status:false,message:err.message})
@@ -147,40 +150,65 @@ const getBookbyId= async function(req,res){
 
 //============================ Put api for updation ===================================
 const updateBookById = async function(req,res){
-    try{
-        let bookId = req.params.bookId
-        
-        
-        let bookDetails =  await bookModel.findOne({_id:bookId,isDeleted:false})
-        if(!bookDetails)
-        return res.status(404).send({status:false,message:"Book not found!"})
+    try {
+        const bookId = req.params.bookId
+        let { title, excerpt, releasedAt, ISBN } = req.body
 
-        let data = req.body
+      
+
+        if (Object.keys(req.body).length === 0) {
+            return res.status(400).send({ status: false, message: "Body cannot be empty" })
+        }
 
        
-        //updating
+        if (!(title || excerpt || releasedAt || ISBN)) {
+            return res.status(400).send({ status: false, message: "Invalid key to update Book." })
+        }
 
-        let update = await bookModel.findByIdAndUpdate({
-            _id:bookId},
-            {
-                $set:{
-                    title:data.title,
-                    ISBN:data.ISBN,
-                    excerpt:data.excerpt,
-                    releasedAt:moment(new Date()).format("YYYY-MM-DD")
-                }
-            },
-            {new:true}
-            );
-            console.log(update)
-            return res.status(200).send({status:true,data:update})
+        
+
+        if (title) {
+            if (!validator.isValidString(title)) {
+                return res.status(400).send({ status: false, message: "Title is in Invalid Format" })
+            }           
+        }
+        let titles = req.body.title
+
+        let checkTitle = await bookModel.findOne({ title: titles })
+        if (checkTitle) {
+            return res.status(400).send({ status: false, message: "Title already used" })
+        }
+
+       
+        if (ISBN) {
+            if (!validator.isValidIsbn(ISBN)) {
+                return res.status(400).send({ status: false, message: "Please provide correct format for ISBN" })
+            };
+        }
+       
+        let checkISBN = await bookModel.findOne({ ISBN: ISBN })
+        if (checkISBN) {
+            return res.status(400).send({ status: false, message: "ISBN already used" })
+        }
+       
+        if (releasedAt) {
+            if (!validator.isValidDate(releasedAt)) {
+                return res.status(400).send({ status: false, message: "releasedAt is in incorrect format (YYYY-MM-DD)" })
+            }
+        }
+       
+        const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
+        if (findBook) {
+            const updateBooks = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { title: titles, excerpt: excerpt, releasedAt: releasedAt, ISBN: ISBN }, { new: true })
+            return res.status(200).send({ status: true, message: "Book updated", data: updateBooks })
+        }
+        else {
+            return res.status(404).send({ status: false, message: "Book already deleted" })
+        }}
+        catch(err){
+            res.status(500).send({status:false,message:err.message})
+        }
     }
-    catch(err){
-        return res.status(500).send({status:false,msg:err.message})
-    }
-}
-
-
 //============================ delete api by params ===================================
 
 const deleteBook =async function(req,res){

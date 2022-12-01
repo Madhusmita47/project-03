@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const moment = require('moment')
 //=========================// isValidEmail //===================================
 
 const isValidEmail = function (value) {
@@ -57,7 +57,18 @@ const isValidtitle = function(title){
     return true
   }
 }
+//==============================// isValid-date //==============================
 
+const isValidDate = function (date) {
+  if (typeof date != "string") return false
+  return moment(date, 'YYYY-MM-DD', true).isValid()
+}
+//==============================// isValid-pincode //==============================
+
+const isvalidPincode = function (pincode) {
+  if (/^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/.test(pincode)) return true
+  return false
+}
 //=============================// module exports //==============================
 
-module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword,isValidIsbn,isValidtitle }
+module.exports = { isValidEmail, isIdValid, isValidString, isValidName, isValidPhone, isValidPassword,isValidIsbn,isValidtitle, isValidDate, isvalidPincode }

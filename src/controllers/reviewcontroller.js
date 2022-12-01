@@ -9,14 +9,12 @@ const createReviewByBookId = async function (req, res) {
     try {
         let bookId = req.params.bookId
 
-        if (!bookId) return res.status(400).send({ status: false, msg: "please give BookId" })
+        if (!bookId) return res.status(400).send({ status: false, msg: "please provide BookId" })
 
         if (!Validator.isIdValid(bookId)) {
             return res.status(400).send({ status: false, message: `${bookId} is not a valid BookId or not present ` })
         }
-        if (!Validator.isValidString(bookId)) {
-            return res.status(400).send({ status: false, message: `${bookId} is not a valid BookId or not present ` })
-        }
+       
 
         let book = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!book) {
@@ -32,16 +30,30 @@ const createReviewByBookId = async function (req, res) {
         const { reviewedBy, rating, review } = requestBody
 
 
+
         if (!Validator.isValidString(reviewedBy)) {
             return res.status(400).send({ status: false, message: " please provide reviewedBy" })
         }
-        if (!Validator.isValidString(rating)) {
-            return res.status(400).send({ status: false, message: " please provide rating" })
+
+        if (!rating) {
+            return res.status(400).send({ status: false, message: "Rating is mandatory" })
         }
 
-        if (!(rating == 1 || rating == 2 || rating == 3 || rating == 4 || rating == 5)) {
-            return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' })
+        if (rating) {
+            if (!(typeof rating == "Number")) {
+                return res.status(400).send({ status: false, message: "Rating should be a number" })
+            }
+
+            if (Number.isInteger(rating)) {
+                if (rating < 1 || rating > 5) {
+                    return res.status(400).send({ status: false, message: "Rating can only be 1,2,3,4,5" })
+                }
+            }
+            else {
+                return res.status(400).send({ status: false, message: "Rating can be only Integer and Whole Number" })
+            }
         }
+
 
         let createReviewData = {
             bookId: bookId,
@@ -70,17 +82,21 @@ const updateReview = async function (req, res) {
     try {
         let bookId = req.params.bookId
         let reviewId = req.params.reviewId
-        if (mongoose.Types.ObjectId.isValid(bookId) == false) { return res.status(400).send({ status: false, message: "invalid bookId" }) }
-        if (mongoose.Types.ObjectId.isValid(reviewId) == false) { return res.status(400).send({ status: false, message: "invalid reviewId" }) }
 
-        let bookExist = await bookModel.findOne({ _id: bookId })
+        if (!Validator.isIdValid(bookId)) 
+        { return res.status(400).send({ status: false, message: "invalid bookId" }) }
+
+        let bookExist = await bookModel.findOne({ _id: bookId, isDeleted: false})
         if (!bookExist) { return res.status(404).send({ status: false, message: "book doesn't exist" }) }
-        let reviewExist = await reviewModel.findOne({ _id: reviewId })
+
+        if (!Validator.isIdValid(reviewId)) { return res.status(400).send({ status: false, message: "invalid reviewId" }) }
+
+        let reviewExist = await reviewModel.findOne({ _id: reviewId, isDeleted: false})
 
         if (!reviewExist) { return res.status(404).send({ status: false, message: "review doesn't exist" }) }
         let data = req.body  
 
-        let updateData = await reviewModel.findOneAndUpdate({ $and: [{ _id: reviewId }, { bookId: bookId }, { isDeleted: false }] }, { $set: { reviewedBy: data.reviewedBy, rating: data.rating, review: data.review } }, { new: true })
+        let updateData = await reviewModel.findOneAndUpdate({ $and: [{ _id: reviewId }, { bookId: bookId }] },     { $set: { reviewedBy: data.reviewedBy, rating: data.rating, review: data.review } }, { new: true })
         if (!updateData) { return res.status(404).send({ status: false, message: "This Book does not have this review" }) }
         res.status(200).send({ status: true, message: updateData })
     }
