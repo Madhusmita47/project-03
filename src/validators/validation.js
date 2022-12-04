@@ -25,7 +25,7 @@ const isValidString = function (value) {
 //==============================// isValidName //===============================
 
 const isValidName = function (name) {
-  if (/^[a-zA-Z ]+$/.test(name)) {
+  if (/^[a-z A-Z ]+$/.test(name)) {
     return true;
   }
 };

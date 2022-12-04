@@ -98,8 +98,7 @@ const getBookByQuery = async function(req,res){
             excerpt:1,
             userId:1,
             category:1,
-            subcategory:1,
-            reviews:1,
+             reviews:1,
             releasedAt:1
           
         })

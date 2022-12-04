@@ -40,7 +40,7 @@ const createReviewByBookId = async function (req, res) {
         }
 
         if (rating) {
-            if (!(typeof rating == "Number")) {
+            if (!(typeof rating == "number")) {
                 return res.status(400).send({ status: false, message: "Rating should be a number" })
             }
 
