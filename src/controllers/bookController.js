@@ -2,9 +2,7 @@ const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
 const mongoose = require('mongoose')
 const validator = require('../validators/validation')
-const moment = require('moment')
 const lodash = require('lodash')
-const jwt = require('jsonwebtoken')
 const reviewModel=require("../models/reviewModel")
 
 //============================ post API for create book ===================================
@@ -50,9 +48,9 @@ const createBook = async function(req,res){
         if(!validator.isValidString(ISBN)){
             return res.status(400).send({status:false,msg:"Please Enter ISBN!"})
         }
-        // if(!validator.isValidIsbn(ISBN)){
-        //     return res.status(400).send({status:false,msg:"ISBN is Invalid!"})
-        // }
+        if(!validator.isValidIsbn(ISBN)){
+            return res.status(400).send({status:false,msg:"ISBN is Invalid!"})
+        }
         let checkISBN = await bookModel.findOne({ISBN:ISBN})
         if(checkISBN){
             return res.status(400).send({status:false,msg:"ISBN already exists"})
@@ -198,7 +196,8 @@ const updateBookById = async function(req,res){
        
         const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (findBook) {
-            const updateBooks = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { title: titles, excerpt: excerpt, releasedAt: releasedAt, ISBN: ISBN }, { new: true })
+            const updateBooks = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, 
+                { title: titles, excerpt: excerpt, releasedAt: releasedAt, ISBN: ISBN }, { new: true })
             return res.status(200).send({ status: true, message: "Book updated", data: updateBooks })
         }
         else {

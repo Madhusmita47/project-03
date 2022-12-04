@@ -1,5 +1,3 @@
-const mongoose = require("mongoose")
-// const userModel=require("../models/userModel")
 const bookModel = require("../models/bookModel")
 const reviewModel = require("../models/reviewModel")
 const Validator = require("../validators/validation")
@@ -30,10 +28,6 @@ const createReviewByBookId = async function (req, res) {
         const { reviewedBy, rating, review } = requestBody
 
 
-
-        if (!Validator.isValidString(reviewedBy)) {
-            return res.status(400).send({ status: false, message: " please provide reviewedBy" })
-        }
 
         if (!rating) {
             return res.status(400).send({ status: false, message: "Rating is mandatory" })
