@@ -4,7 +4,7 @@ const bookModel = require('../models/bookModel')
 
 const Authentication=function (req,res,next){
     try {
-    let token=req.headers["x-auth-token"]
+    let token=req.headers["x-api-key"]
     if(!token) {return res.status(400).send({status:false,message:"token must be present"})}
  let decode =jwt.verify(token,"group 38")
  if(!decode) { return res.status(401).send({status:false,message:"user not authenticated"})}
@@ -19,7 +19,7 @@ const authorisation = async function(req,res,next){
         let bookId = req.params.bookId   //params
 
 
-        let token = req.headers["x-auth-token"] 
+        let token = req.headers["x-api-key"] 
         let decoded = jwt.verify(token, 'group 38')     // {userId:"7979879789"}
     
         if (!decoded) {

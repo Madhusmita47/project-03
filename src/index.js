@@ -8,7 +8,7 @@ app.use(express.json());
 app.use( multer().any()) 
 
 
-mongoose.connect("mongodb+srv://kunal0709:Singhkunal7@cluster0.u5yk4f2.mongodb.net/group38Database",{
+mongoose.connect("mongodb+srv://madhusmita_123:5fiVrKsOKBIGJsKe@cluster0.cpbhduk.mongodb.net/project-03",{
     useNewUrlParser:true  
 }) 
 
