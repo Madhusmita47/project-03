@@ -117,7 +117,7 @@ let loginUser=async function(req,res){
       },"group 38",{expiresIn:"1hr"},{iat:Date.now()})
   
       res.setHeader("x-auth-token",token)
-      res.status(200).send({status:true,token:token})
+      res.status(200).send({status:true,token:token,expiresIn:"1hr",issuedAt:Date.now()})
   
     }
     catch(err){

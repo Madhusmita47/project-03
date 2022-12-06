@@ -13,7 +13,7 @@ const createBook = async function(req,res){
             return res.status(400).send({status:false,msg:"Request Body is Empty!"})
         }
         
-        let {title,excerpt,userId,ISBN,category,subcategory, releasedAt} = data
+        let {title,excerpt,userId,ISBN,category,subcategory, releasedAt,bookCover} = data
         
     
 
@@ -71,6 +71,10 @@ const createBook = async function(req,res){
             return res.status(400).send({status:false,msg:"Please Enter valid date format"})
         }
         
+        //bookcover
+        if(!validator.isValidString(bookCover)){
+            return res.status(400).send({status:false,msg:"Please provide bookCover link"})
+        }
 
         //create Book
         let saveData = await bookModel.create(data)

@@ -90,7 +90,9 @@ const updateReview = async function (req, res) {
         if (!reviewExist) { return res.status(404).send({ status: false, message: "review doesn't exist" }) }
         let data = req.body  
 
-        let updateData = await reviewModel.findOneAndUpdate({ $and: [{ _id: reviewId }, { bookId: bookId }] },     { $set: { reviewedBy: data.reviewedBy, rating: data.rating, review: data.review } }, { new: true })
+        let updateData = await reviewModel.findOneAndUpdate({ $and: [{ _id: reviewId }, { bookId: bookId }] },
+                 { $set: { reviewedBy: data.reviewedBy, rating: data.rating, review: data.review } },
+                  { new: true })
         if (!updateData) { return res.status(404).send({ status: false, message: "This Book does not have this review" }) }
         res.status(200).send({ status: true, message: updateData })
     }
@@ -152,3 +154,5 @@ const deleteReview = async function (req, res) {
 
 
 module.exports = { updateReview, deleteReview, createReviewByBookId }
+
+
